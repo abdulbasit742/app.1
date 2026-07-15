@@ -1,63 +1,37 @@
 @echo off
+setlocal
+
 echo ========================================
-echo PES Pakistan Web Application Setup
+echo PES Pakistan Backend Setup
 echo ========================================
-echo.
 
-echo [1/5] Creating Python virtual environment...
-python -m venv venv
-if errorlevel 1 (
-    echo ERROR: Failed to create virtual environment. Please ensure Python 3.10+ is installed.
-    pause
-    exit /b 1
-)
+echo [1/3] Creating Python virtual environment...
+python -m venv .venv
+if errorlevel 1 exit /b 1
 
-echo [2/5] Activating virtual environment...
-call venv\Scripts\activate.bat
+echo [2/3] Activating virtual environment...
+call .venv\Scripts\activate.bat
+if errorlevel 1 exit /b 1
 
-echo [3/5] Installing Python dependencies...
-pip install -r requirements.txt
-if errorlevel 1 (
-    echo ERROR: Failed to install Python dependencies.
-    pause
-    exit /b 1
-)
-
-echo [4/5] Setting up frontend...
-cd ..\pes-frontend
-call npm install
-if errorlevel 1 (
-    echo ERROR: Failed to install Node.js dependencies. Please ensure Node.js is installed.
-    pause
-    exit /b 1
-)
-
-echo [5/5] Building frontend...
-call npm run build
-if errorlevel 1 (
-    echo ERROR: Failed to build frontend.
-    pause
-    exit /b 1
-)
-
-echo Copying frontend files to Flask static directory...
-xcopy /E /I /Y dist\* ..\pes-app\src\static\
-
-cd ..\pes-app
+echo [3/3] Installing pinned Python dependencies...
+python -m pip install -r requirements.txt
+if errorlevel 1 exit /b 1
 
 echo.
-echo ========================================
-echo Setup completed successfully!
-echo ========================================
+echo Setup completed.
 echo.
-echo To start the application:
-echo 1. Run: python src/main.py
-echo 2. Open browser to: http://localhost:5000
-echo 3. Login with: admin@pes.com / admin123
+echo Before starting, configure SECRET_KEY with at least 32 random characters.
+echo To create the first administrator, optionally configure all three variables:
+echo   PES_BOOTSTRAP_ADMIN_EMAIL
+ echo   PES_BOOTSTRAP_ADMIN_PASSWORD
+ echo   PES_BOOTSTRAP_ADMIN_NAME
+ echo Remove the bootstrap variables after the administrator is created.
 echo.
-echo Press any key to start the application now...
-pause > nul
+echo Run verification:
+echo   python -m unittest discover -s tests -v
+ echo   python scripts\security_check.py
+ echo.
+echo Start locally:
+echo   python src\main.py
 
-echo Starting PES Pakistan Web Application...
-python src/main.py
-
+endlocal
